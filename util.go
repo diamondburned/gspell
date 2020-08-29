@@ -1,7 +1,5 @@
 package gspell
 
-// #cgo pkg-config: gdk-3.0 gio-2.0 glib-2.0 gobject-2.0 gtk+-3.0
-// #include <gio/gio.h>
 // #include <gtk/gtk.h>
 // #include "util.h"
 import "C"
