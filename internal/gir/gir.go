@@ -59,15 +59,6 @@ func NewGotk3Generator(name string) *jen.File {
 	f.CgoPreamble("#include <gio/gio.h>")
 	f.CgoPreamble("#include <glib.h>")
 	f.CgoPreamble("#include <glib-object.h>")
-	f.CgoPreamble("extern void callbackDelete(gpointer ptr);")
-
-	f.Comment("//export callbackDelete")
-	f.Func().Id("callbackDelete").Params(jen.Id("ptr").Qual("C", "gpointer")).Block(
-		jen.Qual("github.com/diamondburned/gspell/internal/callback", "Delete").Call(
-			jen.Uintptr().Call(jen.Id("ptr")),
-		),
-	)
-	f.Line()
 
 	f.Comment("objector is used internally for other interfaces.")
 	f.Type().Id("objector").Interface(

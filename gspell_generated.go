@@ -1,7 +1,6 @@
 package gspell
 
 import (
-	"github.com/diamondburned/gspell/internal/callback"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"unsafe"
@@ -13,14 +12,8 @@ import (
 // #include <gio/gio.h>
 // #include <glib.h>
 // #include <glib-object.h>
-// extern void callbackDelete(gpointer ptr);
 //
 import "C"
-
-//export callbackDelete
-func callbackDelete(ptr C.gpointer) {
-	callback.Delete(uintptr(ptr))
-}
 
 // objector is used internally for other interfaces.
 type objector interface {
