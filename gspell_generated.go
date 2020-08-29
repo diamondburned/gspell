@@ -372,6 +372,14 @@ func (e *Entry) native() *C.GspellEntry {
 	return (*C.GspellEntry)(unsafe.Pointer(e.Object.Native()))
 }
 
+// GetFromGtkEntry returns the Entry of gtk_entry. The returned object is
+// guaranteed to be the same for the lifetime of gtk_entry.
+func GetFromGtkEntry(gtkEntry *gtk.Entry) *Entry {
+	v1 := (*C.GtkEntry)(unsafe.Pointer(gtkEntry.Widget.Native()))
+	r := wrapEntry(unsafe.Pointer(C.gspell_entry_get_from_gtk_entry(v1)))
+	return r
+}
+
 // BasicSetup function is a convenience function that does the following: - Set
 // a spell checker. The language chosen is the one returned by
 // LanguageGetDefault(). - Set the Entry:inline-spell-checking property to true.
@@ -442,6 +450,14 @@ func marshalEntryBuffer(p uintptr) (interface{}, error) {
 // native turns the current *EntryBuffer into the native C pointer type.
 func (e *EntryBuffer) native() *C.GspellEntryBuffer {
 	return (*C.GspellEntryBuffer)(unsafe.Pointer(e.Object.Native()))
+}
+
+// GetFromGtkEntryBuffer returns the EntryBuffer of gtk_buffer. The returned
+// object is guaranteed to be the same for the lifetime of gtk_buffer.
+func GetFromGtkEntryBuffer(gtkBuffer *gtk.EntryBuffer) *EntryBuffer {
+	v1 := (*C.GtkEntryBuffer)(unsafe.Pointer(gtkBuffer.Native()))
+	r := wrapEntryBuffer(unsafe.Pointer(C.gspell_entry_buffer_get_from_gtk_entry_buffer(v1)))
+	return r
 }
 
 func (e *EntryBuffer) GetBuffer() *gtk.EntryBuffer {
@@ -582,6 +598,13 @@ func (n *NavigatorTextView) native() *C.GspellNavigatorTextView {
 	return (*C.GspellNavigatorTextView)(unsafe.Pointer(n.InitiallyUnowned.Native()))
 }
 
+func New(view *gtk.TextView) *Navigator {
+	v1 := (*C.GtkTextView)(unsafe.Pointer(view.Widget.Native()))
+	obj := glib.Take(unsafe.Pointer(C.gspell_navigator_text_view_new(v1)))
+	r := &Navigator{obj}
+	return r
+}
+
 func (n *NavigatorTextView) GetView() *gtk.TextView {
 	obj := glib.Take(unsafe.Pointer(C.gspell_navigator_text_view_get_view(n.native())))
 	r := &gtk.TextView{
@@ -615,6 +638,14 @@ func marshalTextBuffer(p uintptr) (interface{}, error) {
 // native turns the current *TextBuffer into the native C pointer type.
 func (t *TextBuffer) native() *C.GspellTextBuffer {
 	return (*C.GspellTextBuffer)(unsafe.Pointer(t.Object.Native()))
+}
+
+// GetFromGtkTextBuffer returns the TextBuffer of gtk_buffer. The returned
+// object is guaranteed to be the same for the lifetime of gtk_buffer.
+func GetFromGtkTextBuffer(gtkBuffer *gtk.TextBuffer) *TextBuffer {
+	v1 := (*C.GtkTextBuffer)(unsafe.Pointer(gtkBuffer.Native()))
+	r := wrapTextBuffer(unsafe.Pointer(C.gspell_text_buffer_get_from_gtk_text_buffer(v1)))
+	return r
 }
 
 func (t *TextBuffer) GetBuffer() *gtk.TextBuffer {
@@ -656,6 +687,14 @@ func marshalTextView(p uintptr) (interface{}, error) {
 // native turns the current *TextView into the native C pointer type.
 func (t *TextView) native() *C.GspellTextView {
 	return (*C.GspellTextView)(unsafe.Pointer(t.Object.Native()))
+}
+
+// GetFromGtkTextView returns the TextView of gtk_view. The returned object is
+// guaranteed to be the same for the lifetime of gtk_view.
+func GetFromGtkTextView(gtkView *gtk.TextView) *TextView {
+	v1 := (*C.GtkTextView)(unsafe.Pointer(gtkView.Widget.Native()))
+	r := wrapTextView(unsafe.Pointer(C.gspell_text_view_get_from_gtk_text_view(v1)))
+	return r
 }
 
 // BasicSetup function is a convenience function that does the following: - Set

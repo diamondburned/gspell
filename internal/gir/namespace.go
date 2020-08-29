@@ -121,6 +121,10 @@ func (n namespaceGenerator) GenFunctions() *jen.Statement {
 	var f = new(jen.Statement)
 
 	for _, function := range n.Functions {
+		if function.IsIgnored() {
+			continue
+		}
+
 		f.Add(function.GenFunc())
 		f.Line()
 	}

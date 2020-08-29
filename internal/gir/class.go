@@ -25,8 +25,7 @@ type Class struct {
 	Constructors []Constructor `xml:"http://www.gtk.org/introspection/core/1.0 constructor"`
 	Methods      []Method      `xml:"http://www.gtk.org/introspection/core/1.0 method"`
 	Fields       []Field       `xml:"http://www.gtk.org/introspection/core/1.0 field"`
-
-	// Functions    []Function    `xml:"http://www.gtk.org/introspection/core/1.0 function"`
+	Functions    []Function    `xml:"http://www.gtk.org/introspection/core/1.0 function"`
 	// Callbacks    []Callback    `xml:"http://www.gtk.org/introspection/core/1.0 callback"`
 }
 
@@ -57,6 +56,8 @@ func (c Class) GenerateAll() *jen.Statement {
 	f.Add(c.GenConstructors())
 	f.Line()
 	f.Add(c.GenNative())
+	f.Line()
+	f.Add(c.GenFunctions())
 	f.Line()
 	f.Add(c.GenMethods())
 	return f
@@ -198,6 +199,21 @@ func (c Class) GenNative() *jen.Statement {
 	}
 
 	f.Line()
+	return f
+}
+
+func (c Class) GenFunctions() *jen.Statement {
+	var f = new(jen.Statement)
+
+	for _, function := range c.Functions {
+		if function.IsIgnored() {
+			continue
+		}
+
+		f.Add(function.GenFunc())
+		f.Line()
+	}
+
 	return f
 }
 
