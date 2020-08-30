@@ -168,6 +168,10 @@ func CheckerErrorQuark() glib.Quark {
 }
 func LanguageGetAvailable() *glib.List {
 	r := glib.WrapList(uintptr(unsafe.Pointer(C.gspell_language_get_available())))
+	r.DataWrapper(func(ptr unsafe.Pointer) interface{} {
+		val := (*Language)(ptr)
+		return val
+	})
 	return r
 }
 

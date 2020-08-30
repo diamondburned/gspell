@@ -14,6 +14,9 @@ type Type struct {
 	Name           string   `xml:"name,attr"`
 	CType          string   `xml:"http://www.gtk.org/introspection/c/1.0 type,attr"`
 	Introspectable *bool    `xml:"introspectable,attr"`
+
+	// Nested recursive types.
+	ChildType *Type
 }
 
 func (t Type) IsPtr() bool {
@@ -209,6 +212,22 @@ func typeMapInterface(parts []string) (ptr bool) {
 	return true
 }
 
+func (t Type) FindNamespace() interface{} {
+	for _, class := range activeNamespace.Classes {
+		if class.Name == t.Name {
+			return class
+		}
+	}
+
+	for _, record := range activeNamespace.Records {
+		if record.Name == t.Name {
+			return record
+		}
+	}
+
+	return nil
+}
+
 // GenCaster generates the type or function to be used to cast or convert C to
 // Go types.
 func (t Type) GenCaster(tmpVar, value *jen.Statement) *jen.Statement {
@@ -250,9 +269,16 @@ func (t Type) GenCaster(tmpVar, value *jen.Statement) *jen.Statement {
 
 	// Handle *glib.List separately.
 	case "glib.List", "*glib.List":
-		return stmt.Qual("github.com/gotk3/gotk3/glib", "WrapList").Call(
+		stmt.Qual("github.com/gotk3/gotk3/glib", "WrapList").Call(
 			jen.Uintptr().Call(jen.Qual("unsafe", "Pointer").Call(value)),
 		)
+
+		if t.ChildType != nil {
+			stmt.Line()
+			stmt.Add(t.ChildType.GenListWrapper(tmpVar))
+		}
+
+		return stmt
 
 	// Handle glib.ListModel separately. TODO: handle all glib types that
 	// embed *glib.Object.
@@ -309,6 +335,32 @@ func (t Type) GenCaster(tmpVar, value *jen.Statement) *jen.Statement {
 	stmt.Call(value)
 
 	return stmt
+}
+
+func (t Type) GenListWrapper(listVar *jen.Statement) *jen.Statement {
+	var ptr = jen.Id("ptr")
+	var tmp = jen.Id("val")
+
+	if t.CType == "" {
+		switch nsp := t.FindNamespace().(type) {
+		case Record:
+
+			t.CType = nsp.CType + "*"
+
+		case Class:
+			log.Panicln("Unknown class of type", t.Name)
+
+		case nil:
+			return nil
+		}
+	}
+
+	return jen.Add(listVar).Dot("DataWrapper").Call(
+		jen.Func().Params(jen.Add(ptr).Qual("unsafe", "Pointer")).Interface().Block(
+			jen.Add(t.GenCaster(tmp, ptr)),
+			jen.Return().Add(tmp),
+		),
+	)
 }
 
 func genObjectCtor(value, tmpVar *jen.Statement) *jen.Statement {
