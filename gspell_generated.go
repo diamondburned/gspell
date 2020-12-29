@@ -18,8 +18,8 @@ import "C"
 // objector is used internally for other interfaces.
 type objector interface {
 	glib.IObject
-	Connect(string, interface{}, ...interface{}) (glib.SignalHandle, error)
-	ConnectAfter(string, interface{}, ...interface{}) (glib.SignalHandle, error)
+	Connect(string, interface{}) glib.SignalHandle
+	ConnectAfter(string, interface{}) glib.SignalHandle
 	GetProperty(name string) (interface{}, error)
 	SetProperty(name string, value interface{}) error
 	Native() uintptr
